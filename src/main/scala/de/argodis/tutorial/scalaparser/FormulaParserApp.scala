@@ -10,7 +10,6 @@ object FormulaParserApp {
       .addObject(arguments)
       .build()
       .parse(args.toArray: _*)
-
     // Return the parsed arguments
     arguments
   }
