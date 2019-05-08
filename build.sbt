@@ -10,7 +10,11 @@ scalaVersion := "2.12.8"
 //------------------------------------------------------------------------------
 libraryDependencies ++= Seq (
   "com.beust"                     %  "jcommander"                       % Version.jcommander,
-  "org.scala-lang.modules"        %  "scala-parser-combinators_2.12"    % Version.parsercombinators,
+  "org.scala-lang.modules"        %%  "scala-parser-combinators"    % Version.parsercombinators,
+  // Jackson
+  "com.fasterxml.jackson.core"       % "jackson-databind"               % Version.jackson,
+  "com.fasterxml.jackson.dataformat" % "jackson-dataformat-csv"         % Version.jackson,
+  "com.fasterxml.jackson.module"     %% "jackson-module-scala"      % Version.jackson,
   "org.scalatest"                 %% "scalatest"                        % Version.scalatest         % "test"
 )
 
