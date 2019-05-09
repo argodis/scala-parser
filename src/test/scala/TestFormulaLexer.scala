@@ -16,6 +16,33 @@ class TestFormulaLexer extends FunSuite with Matchers {
       .map(tokens => tokens shouldBe SIMPLE_FORMULA_TOKENS)
   }
 
-  test("test") {
+  test("lexer recognizes negative integers") {
+    FormulaLexer
+      .tokenize("-10")
+      .map(tokens => tokens shouldBe List(CONSTANT(-10)))
+  }
+
+  test("lexer recognizes negative floating point numbers") {
+    FormulaLexer
+      .tokenize("-0.75")
+      .map(tokens => tokens shouldBe List(CONSTANT(-0.75)))
+  }
+
+  test("lexer recognizes negative number after multiplication") {
+    FormulaLexer
+      .tokenize("1.32 * -0.35")
+      .map(tokens => tokens shouldBe List(CONSTANT(1.32), OPERATOR_MULTIPLY, CONSTANT(-0.35)))
+  }
+
+  test("lexer recognizes negative number after addition") {
+    FormulaLexer
+      .tokenize("1.32 + -0.35")
+      .map(tokens => tokens shouldBe List(CONSTANT(1.32), OPERATOR_ADD, CONSTANT(-0.35)))
+  }
+
+  test("lexer recognizes negative number after subtraction") {
+    FormulaLexer
+      .tokenize("1.32 - -0.35")
+      .map(tokens => tokens shouldBe List(CONSTANT(1.32), OPERATOR_SUBTRACT, CONSTANT(-0.35)))
   }
 }
