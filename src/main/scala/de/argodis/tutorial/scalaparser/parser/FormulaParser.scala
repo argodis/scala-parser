@@ -1,7 +1,8 @@
 package de.argodis.tutorial.scalaparser.parser
 
-import de.argodis.tutorial.scalaparser.parser.nodes.{Constant, FormulaAST}
-import de.argodis.tutorial.scalaparser.parser.tokens.{CONSTANT, FormulaToken}
+import de.argodis.tutorial.scalaparser.parser.nodes.{Constant, FormulaAST, Variable}
+import de.argodis.tutorial.scalaparser.parser.tokens.{CONSTANT, FormulaToken, VARIABLE}
+
 import scala.util.parsing.combinator.Parsers
 
 object FormulaParser extends Parsers {
@@ -9,7 +10,8 @@ object FormulaParser extends Parsers {
   override type Elem = FormulaToken
 
   private def constant = accept("Constant", { case CONSTANT(value) => Constant(value) })
-  private def formula: Parser[FormulaAST] = phrase(constant)
+  private def variable = accept("Variable", { case VARIABLE(id) => Variable(id) })
+  private def formula: Parser[FormulaAST] = phrase(constant | variable)
 
   def parse(formulaExpression: String): Either[String, FormulaAST] =
     // Unfortunately ParseResult does not provide flatMap
