@@ -68,4 +68,28 @@ class TestFormulaParser extends FunSuite with Matchers {
   test("parser should fail to parse the expression '- $3'") {
     FormulaParser.parse("- $3") shouldBe a ('Left)
   }
+
+  test("parser produce the expression '$1 + $2 + $3'") {
+    val tree = OperatorAdd(Variable(1), OperatorAdd(Variable(2), Variable(3)))
+    FormulaParser.parse("$1 + $2 + $3") shouldBe Right(tree)
+  }
+
+  test("parser produce the expression '$1 - $2 - $3'") {
+    val tree = OperatorSubtract(Variable(1), OperatorSubtract(Variable(2), Variable(3)))
+    FormulaParser.parse("$1 - $2 - $3") shouldBe Right(tree)
+  }
+
+  test("parser produce the expression '$1 + $2 - $3'") {
+    val tree = OperatorAdd(Variable(1), OperatorSubtract(Variable(2), Variable(3)))
+    FormulaParser.parse("$1 + $2 - $3") shouldBe Right(tree)
+  }
+
+  test("parser should fail to parse the expression '$1 + $2 $3'") {
+    FormulaParser.parse("$1 + $2 $3") shouldBe a ('Left)
+  }
+
+  test("parser should fail to parse the expression '$1 $2 - $3'") {
+    FormulaParser.parse("$1 $2 - $3") shouldBe a ('Left)
+  }
+
 }

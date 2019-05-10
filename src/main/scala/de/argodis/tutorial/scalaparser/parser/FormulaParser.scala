@@ -15,10 +15,18 @@ object FormulaParser extends Parsers {
   private def terminal: Parser[FormulaAST] = constant | variable
 
   // Sum operators
+//  private def expression: Parser[FormulaAST] =
+//    terminal ~ (OPERATOR_ADD | OPERATOR_SUBTRACT) ~ terminal ^^ {
+//      case left ~ OPERATOR_ADD ~ right => OperatorAdd(left, right)
+//      case left ~ OPERATOR_SUBTRACT ~ right => OperatorSubtract(left, right)
+//    }
   private def expression: Parser[FormulaAST] =
-    terminal ~ (OPERATOR_ADD | OPERATOR_SUBTRACT) ~ terminal ^^ {
-      case left ~ OPERATOR_ADD ~ right => OperatorAdd(left, right)
-      case left ~ OPERATOR_SUBTRACT ~ right => OperatorSubtract(left, right)
+    terminal ~ opt((OPERATOR_ADD | OPERATOR_SUBTRACT) ~ expression) ^^ {
+      case left ~ None => left
+      case left ~ Some(operator ~ right) => operator match {
+        case OPERATOR_SUBTRACT => OperatorSubtract(left, right)
+        case OPERATOR_ADD => OperatorAdd(left, right)
+      }
     }
 
   // Top-level rule
