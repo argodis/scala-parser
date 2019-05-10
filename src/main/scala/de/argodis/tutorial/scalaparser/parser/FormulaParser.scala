@@ -1,7 +1,7 @@
 package de.argodis.tutorial.scalaparser.parser
 
-import de.argodis.tutorial.scalaparser.parser.nodes.{Constant, FormulaAST, OperatorAdd, Variable}
-import de.argodis.tutorial.scalaparser.parser.tokens.{CONSTANT, FormulaToken, OPERATOR_ADD, VARIABLE}
+import de.argodis.tutorial.scalaparser.parser.nodes.{Constant, FormulaAST, OperatorAdd, OperatorSubtract, Variable}
+import de.argodis.tutorial.scalaparser.parser.tokens.{CONSTANT, FormulaToken, OPERATOR_ADD, OPERATOR_SUBTRACT, VARIABLE}
 
 import scala.util.parsing.combinator.Parsers
 
@@ -16,7 +16,10 @@ object FormulaParser extends Parsers {
 
   // Sum operators
   private def expression: Parser[FormulaAST] =
-    terminal ~ OPERATOR_ADD ~ terminal ^^ { case left ~ OPERATOR_ADD ~ right => OperatorAdd(left, right) }
+    terminal ~ (OPERATOR_ADD | OPERATOR_SUBTRACT) ~ terminal ^^ {
+      case left ~ OPERATOR_ADD ~ right => OperatorAdd(left, right)
+      case left ~ OPERATOR_SUBTRACT ~ right => OperatorSubtract(left, right)
+    }
 
   // Top-level rule
   private def formula: Parser[FormulaAST] = phrase(expression | terminal)

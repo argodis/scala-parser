@@ -1,4 +1,4 @@
-import de.argodis.tutorial.scalaparser.parser.nodes.{Constant, OperatorAdd, Variable}
+import de.argodis.tutorial.scalaparser.parser.nodes.{Constant, OperatorAdd, OperatorSubtract, Variable}
 import de.argodis.tutorial.scalaparser.parser.FormulaParser
 import org.scalatest.{FunSuite, Matchers}
 
@@ -47,5 +47,25 @@ class TestFormulaParser extends FunSuite with Matchers {
 
   test("parser should fail to parse the expression '+ $3'") {
     FormulaParser.parse("+ $3") shouldBe a ('Left)
+  }
+
+  test("parser can produce the expression 3.2 - 7.8") {
+    FormulaParser.parse("3.2 - 7.8") shouldBe Right(OperatorSubtract(Constant(3.2), Constant(7.8)))
+  }
+
+  test("parser can produce the expression -0.75 - $3") {
+    FormulaParser.parse("-0.75 - $3") shouldBe Right(OperatorSubtract(Constant(-0.75), Variable(3)))
+  }
+
+  test("parser can produce the expression $8 - $9") {
+    FormulaParser.parse("$8 - $9") shouldBe Right(OperatorSubtract(Variable(8), Variable(9)))
+  }
+
+  test("parser should fail to parse the expression '$1 - '") {
+    FormulaParser.parse("$1 - ") shouldBe a ('Left)
+  }
+
+  test("parser should fail to parse the expression '- $3'") {
+    FormulaParser.parse("- $3") shouldBe a ('Left)
   }
 }
