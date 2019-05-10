@@ -9,21 +9,21 @@ object FormulaLexer extends RegexParsers {
   override val whiteSpace: Regex = "[ \t\r\f]+".r
 
   // Braces
-  def brace_left: Parser[FormulaToken] = "(" ^^ { _ => BRACE_LEFT }
-  def brace_right: Parser[FormulaToken] = ")" ^^ { _ => BRACE_RIGHT }
+  private def brace_left: Parser[FormulaToken] = "(" ^^ { _ => BRACE_LEFT }
+  private def brace_right: Parser[FormulaToken] = ")" ^^ { _ => BRACE_RIGHT }
   // Algebraic operators
-  def operator_multiply: Parser[FormulaToken] = "*" ^^ { _ => OPERATOR_MULTIPLY }
-  def operator_divide: Parser[FormulaToken] = "/" ^^ { _ => OPERATOR_DIVIDE }
-  def operator_add: Parser[FormulaToken] = "+" ^^ { _ => OPERATOR_ADD }
-  def operator_subtract: Parser[FormulaToken] = "-" ^^ { _ => OPERATOR_SUBTRACT }
+  private def operator_multiply: Parser[FormulaToken] = "*" ^^ { _ => OPERATOR_MULTIPLY }
+  private def operator_divide: Parser[FormulaToken] = "/" ^^ { _ => OPERATOR_DIVIDE }
+  private def operator_add: Parser[FormulaToken] = "+" ^^ { _ => OPERATOR_ADD }
+  private def operator_subtract: Parser[FormulaToken] = "-" ^^ { _ => OPERATOR_SUBTRACT }
   // Variable
-  def variable: Parser[FormulaToken] = "$" ~> """\d+""".r ^^ { id => VARIABLE(id.toInt) }
+  private def variable: Parser[FormulaToken] = "$" ~> """\d+""".r ^^ { id => VARIABLE(id.toInt) }
   // Constant
-  def constant: Parser[FormulaToken] = {
+  private def constant: Parser[FormulaToken] = {
     """-?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?[fFdD]?""".r ^^ { value => CONSTANT(value.toDouble) }
   }
 
-  def tokens: Parser[List[FormulaToken]] =
+  private def tokens: Parser[List[FormulaToken]] =
     phrase(
       rep1(
         brace_left
@@ -37,4 +37,8 @@ object FormulaLexer extends RegexParsers {
     )) ^^ { rawTokens => rawTokens }
 
   def tokenize(formula: String): ParseResult[List[FormulaToken]] = parse(tokens, formula)
+  def tokenize2(formula: String): Either[String, List[FormulaToken]] = parse(tokens, formula) match {
+    case Success(tokens, _ ) => Right(tokens)
+    case Failure(msg, _) => Left(msg)
+  }
 }
