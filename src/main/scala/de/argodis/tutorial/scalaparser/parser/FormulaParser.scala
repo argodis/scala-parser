@@ -1,7 +1,7 @@
 package de.argodis.tutorial.scalaparser.parser
 
-import de.argodis.tutorial.scalaparser.parser.nodes.{Constant, FormulaAST, Variable}
-import de.argodis.tutorial.scalaparser.parser.tokens.{CONSTANT, FormulaToken, VARIABLE}
+import de.argodis.tutorial.scalaparser.parser.nodes.{Constant, FormulaAST, OperatorAdd, Variable}
+import de.argodis.tutorial.scalaparser.parser.tokens.{CONSTANT, FormulaToken, OPERATOR_ADD, VARIABLE}
 
 import scala.util.parsing.combinator.Parsers
 
@@ -14,8 +14,12 @@ object FormulaParser extends Parsers {
   private def variable = accept("Variable", { case VARIABLE(id) => Variable(id) })
   private def terminal: Parser[FormulaAST] = constant | variable
 
-  //
-  private def formula: Parser[FormulaAST] = phrase(terminal)
+  // Sum operators
+  private def expression: Parser[FormulaAST] =
+    terminal ~ OPERATOR_ADD ~ terminal ^^ { case left ~ OPERATOR_ADD ~ right => OperatorAdd(left, right) }
+
+  // Top-level rule
+  private def formula: Parser[FormulaAST] = phrase(expression | terminal)
 
   def parse(formulaExpression: String): Either[String, FormulaAST] =
     // Unfortunately ParseResult does not provide flatMap
