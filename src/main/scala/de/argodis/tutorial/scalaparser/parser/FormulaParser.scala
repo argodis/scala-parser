@@ -9,9 +9,13 @@ object FormulaParser extends Parsers {
   // This is required for the token reader
   override type Elem = FormulaToken
 
+  // Terminal variables
   private def constant = accept("Constant", { case CONSTANT(value) => Constant(value) })
   private def variable = accept("Variable", { case VARIABLE(id) => Variable(id) })
-  private def formula: Parser[FormulaAST] = phrase(constant | variable)
+  private def terminal: Parser[FormulaAST] = constant | variable
+
+  //
+  private def formula: Parser[FormulaAST] = phrase(terminal)
 
   def parse(formulaExpression: String): Either[String, FormulaAST] =
     // Unfortunately ParseResult does not provide flatMap
