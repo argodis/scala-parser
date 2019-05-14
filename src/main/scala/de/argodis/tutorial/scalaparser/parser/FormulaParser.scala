@@ -14,12 +14,7 @@ object FormulaParser extends Parsers {
   private def variable = accept("Variable", { case VARIABLE(id) => Variable(id) })
   private def terminal: Parser[FormulaAST] = constant | variable
 
-  // Sum operators
-//  private def expression: Parser[FormulaAST] =
-//    terminal ~ (OPERATOR_ADD | OPERATOR_SUBTRACT) ~ terminal ^^ {
-//      case left ~ OPERATOR_ADD ~ right => OperatorAdd(left, right)
-//      case left ~ OPERATOR_SUBTRACT ~ right => OperatorSubtract(left, right)
-//    }
+  // Sum operators - priority 1 (lowest)
   private def operator_sum: Parser[FormulaAST] =
     operator_product ~ opt((OPERATOR_ADD | OPERATOR_SUBTRACT) ~ operator_sum) ^^ {
       case left ~ None => left
@@ -29,7 +24,7 @@ object FormulaParser extends Parsers {
       }
     }
 
-  // Product operators
+  // Product operators - priority 2 (highest)
   private def operator_product: Parser[FormulaAST] =
     terminal ~ opt((OPERATOR_MULTIPLY | OPERATOR_DIVIDE) ~ operator_product) ^^ {
       case left ~ None => left
