@@ -119,8 +119,49 @@ class TestFormulaParser extends FunSuite with Matchers {
     FormulaParser.parse("$1 * $2 + $3 / $4 - $5") shouldBe Right(tree)
   }
 
+  test("parser should produce the expression '(1)'") {
+    FormulaParser.parse("(1)") shouldBe Right(Constant(1))
+  }
 
+  test("parser should produce the expression '((1))'") {
+    FormulaParser.parse("((1))") shouldBe Right(Constant(1))
+  }
 
+  test("parser should produce the expression '($1)'") {
+    FormulaParser.parse("($1)") shouldBe Right(Variable(1))
+  }
 
+  test("parser should produce the expression '($1 + $2)'") {
+    val tree = OperatorAdd(Variable(1), Variable(2))
+    FormulaParser.parse("($1 + $2)") shouldBe Right(tree)
+  }
 
+  test("parser should produce the expression '($1 * $2)'") {
+    val tree = OperatorMultiply(Variable(1), Variable(2))
+    FormulaParser.parse("($1 * $2)") shouldBe Right(tree)
+
+  }
+
+  test("parser should produce the expression '($1 + $2) + ($3 + $4)'") {
+    val factor1 = OperatorAdd(Variable(1), Variable(2))
+    val factor2 = OperatorAdd(Variable(3), Variable(4))
+    val tree = OperatorAdd(factor1, factor2)
+    FormulaParser.parse("($1 + $2) + ($3 + $4)") shouldBe Right(tree)
+  }
+
+  test("parser should produce the expression '($1 + 10) * ($2 - 4.25)' ") {
+    val factor1 = OperatorAdd(Variable(1), Constant(10))
+    val factor2 = OperatorSubtract(Variable(2), Constant(4.25))
+    val tree = OperatorMultiply(factor1, factor2)
+    FormulaParser.parse("($1 + 10) * ($2 - 4.25)") shouldBe Right(tree)
+  }
+
+  test("parser should produce the expression '(($1 + 2) * ($3 + 4)) / ($5 + 6)' ") {
+    val factor1 = OperatorAdd(Variable(1), Constant(2))
+    val factor2 = OperatorAdd(Variable(3), Constant(4))
+    val numerator = OperatorMultiply(factor1, factor2)
+    val denominator = OperatorAdd(Variable(5), Constant(6))
+    val tree = OperatorDivide(numerator, denominator)
+    FormulaParser.parse("(($1 + 2) * ($3 + 4)) / ($5 + 6)") shouldBe Right(tree)
+  }
 }

@@ -1,7 +1,7 @@
 package de.argodis.tutorial.scalaparser.parser
 
 import de.argodis.tutorial.scalaparser.parser.nodes.{Constant, FormulaAST, OperatorAdd, OperatorDivide, OperatorMultiply, OperatorSubtract, Variable}
-import de.argodis.tutorial.scalaparser.parser.tokens.{CONSTANT, FormulaToken, OPERATOR_ADD, OPERATOR_DIVIDE, OPERATOR_MULTIPLY, OPERATOR_SUBTRACT, VARIABLE}
+import de.argodis.tutorial.scalaparser.parser.tokens.{BRACE_LEFT, BRACE_RIGHT, CONSTANT, FormulaToken, OPERATOR_ADD, OPERATOR_DIVIDE, OPERATOR_MULTIPLY, OPERATOR_SUBTRACT, VARIABLE}
 
 import scala.util.parsing.combinator.Parsers
 
@@ -26,13 +26,16 @@ object FormulaParser extends Parsers {
 
   // Product operators - priority 2 (highest)
   private def operator_product: Parser[FormulaAST] =
-    terminal ~ opt((OPERATOR_MULTIPLY | OPERATOR_DIVIDE) ~ operator_product) ^^ {
+    (factor | terminal) ~ opt((OPERATOR_MULTIPLY | OPERATOR_DIVIDE) ~ operator_product) ^^ {
       case left ~ None => left
       case left ~ Some(operator ~ right) => operator match {
         case OPERATOR_MULTIPLY => OperatorMultiply(left, right)
         case OPERATOR_DIVIDE => OperatorDivide(left, right)
       }
     }
+
+  // Factor
+  private def factor: Parser[FormulaAST] = BRACE_LEFT ~> operator_sum <~ BRACE_RIGHT
 
   // Top-level rule
   private def formula: Parser[FormulaAST] = phrase(operator_sum)
