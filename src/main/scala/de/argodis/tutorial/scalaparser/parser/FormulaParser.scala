@@ -30,7 +30,7 @@ object FormulaParser extends Parsers {
     }
 
   // Top-level rule
-  private def formula: Parser[FormulaAST] = phrase(expression | terminal)
+  private def formula: Parser[FormulaAST] = phrase(expression)
 
   def parse(formulaExpression: String): Either[String, FormulaAST] =
     // Unfortunately ParseResult does not provide flatMap
