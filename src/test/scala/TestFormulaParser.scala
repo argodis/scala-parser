@@ -1,4 +1,4 @@
-import de.argodis.tutorial.scalaparser.parser.nodes.{Constant, OperatorAdd, OperatorSubtract, Variable}
+import de.argodis.tutorial.scalaparser.parser.nodes.{Constant, OperatorAdd, OperatorDivide, OperatorMultiply, OperatorSubtract, Variable}
 import de.argodis.tutorial.scalaparser.parser.FormulaParser
 import org.scalatest.{FunSuite, Matchers}
 
@@ -91,5 +91,36 @@ class TestFormulaParser extends FunSuite with Matchers {
   test("parser should fail to parse the expression '$1 $2 - $3'") {
     FormulaParser.parse("$1 $2 - $3") shouldBe a ('Left)
   }
+
+  test("parser should produce the expression '$1 * $2' ") {
+    val tree = OperatorMultiply(Variable(1), Variable(2))
+    FormulaParser.parse("$1 * $2") shouldBe Right(tree)
+  }
+
+  test("parser should produce the expression '$1 / $2' ") {
+    val tree = OperatorDivide(Variable(1), Variable(2))
+    FormulaParser.parse("$1 / $2") shouldBe Right(tree)
+  }
+
+  test("parser should produce the expression '$1 * $2 + $3' ") {
+    val tree = OperatorAdd(OperatorMultiply(Variable(1), Variable(2)), Variable(3))
+    FormulaParser.parse("$1 * $2 + $3") shouldBe Right(tree)
+  }
+
+  test("parser should produce the expression '$1 - $2 / $3' ") {
+    val tree = OperatorSubtract(Variable(1), OperatorDivide(Variable(2), Variable(3)))
+    FormulaParser.parse("$1 - $2 / $3") shouldBe Right(tree)
+  }
+
+  test("parser should produce the expression '$1 * $2 + $3 / $4 - $5' ") {
+    val mul = OperatorMultiply(Variable(1), Variable(2))
+    val div = OperatorDivide(Variable(3), Variable(4))
+    val tree = OperatorAdd(mul, OperatorSubtract(div, Variable(5)))
+    FormulaParser.parse("$1 * $2 + $3 / $4 - $5") shouldBe Right(tree)
+  }
+
+
+
+
 
 }
