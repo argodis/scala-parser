@@ -16,12 +16,9 @@ object FormulaParserApp {
 
   def main(args: Array[String]): Unit = {
     val arguments = parseCliArguments(args)
-    println(s"input: ${arguments.input}")
-    println(s"formula: ${arguments.formula}")
-    println(s"output: ${arguments.output}")
-    val input = Data.loadInput(arguments.input)
-    val formula = Data.loadFormula(arguments.formula)
-    input.foreach(list => println(list.size))
-    formula.foreach(list => println(list.size))
+    val result = for {
+      input <- Data.loadInput(arguments.input)
+      formulas <- Data.loadFormula(arguments.formula)
+    } yield formulas
   }
 }
