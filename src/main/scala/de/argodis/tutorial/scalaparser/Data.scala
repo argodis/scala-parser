@@ -27,7 +27,7 @@ object Data {
         .mkString("\n"))
     }
 
-  def loadCsv[T](path: String)(implicit ct: ClassTag[T]): Try[List[T]] = {
+  def loadCsv[T](path: String)(implicit ct: ClassTag[T]): Either[String, List[T]] = {
     val mapper = new CsvMapper with ScalaObjectMapper
     mapper.registerModule(DefaultScalaModule)
     loadFileContent(path).map{content =>
@@ -39,8 +39,11 @@ object Data {
         .asScala
         .toList
     }
+  }.toEither match {
+    case Left(error) => Left(error.getMessage)
+    case Right(msg) => Right(msg)
   }
 
-  def loadInput(path: String): Try[List[InputDataRow]] = loadCsv[InputDataRow](path)
-  def loadFormula(path: String): Try[List[FormulaRow]] = loadCsv[FormulaRow](path)
+  def loadInput(path: String): Either[String, List[InputDataRow]] = loadCsv[InputDataRow](path)
+  def loadFormula(path: String): Either[String, List[FormulaRow]] = loadCsv[FormulaRow](path)
 }
