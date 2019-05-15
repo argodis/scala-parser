@@ -22,7 +22,9 @@ object FormulaParserApp {
     val result = for {
       input <- Data.loadInput(arguments.input)
       formulas <- Data.loadFormula(arguments.formula)
-    } yield process(input, formulas)
+      output <- process(input, formulas)
+      msg <- Data.writeOutput(arguments.output, output)
+    } yield msg
 
     result match {
       case Left(errorMessage) => println(s"Error: $errorMessage")

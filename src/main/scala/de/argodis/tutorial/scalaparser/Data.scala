@@ -1,5 +1,5 @@
 package de.argodis.tutorial.scalaparser
-import java.io.{File, FileInputStream}
+import java.io.{BufferedWriter, File, FileInputStream, FileWriter}
 
 import com.fasterxml.jackson.dataformat.csv.{CsvMapper, CsvSchema}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
@@ -46,4 +46,14 @@ object Data {
 
   def loadInput(path: String): Either[String, List[InputDataRow]] = loadCsv[InputDataRow](path)
   def loadFormula(path: String): Either[String, List[FormulaRow]] = loadCsv[FormulaRow](path)
+
+  def writeOutput(path: String, data: List[String]): Either[String, String] = Try {
+    val bw = new BufferedWriter(new FileWriter(new File(path)))
+    bw.write(data.mkString("\n"))
+    bw.close()
+    s"Wrote ${data.size} lines"
+  }.toEither match {
+    case Left(error) => Left(error.getMessage )
+    case Right(msg) => Right(msg)
+  }
 }
