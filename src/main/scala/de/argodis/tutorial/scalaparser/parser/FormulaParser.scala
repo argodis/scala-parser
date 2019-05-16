@@ -45,7 +45,7 @@ object FormulaParser extends Parsers {
       .tokenize(formulaExpression)
       .flatMap(tokens => formula(FormulaTokenReader(tokens)) match {
         case Success(ast, _) => Right(ast)
-        case Failure(msg, _) => Left(msg)
-        case Error(msg, _) => Left(msg)
+        case Failure(msg, input) => Left(s"Parser Error: '$msg'. Input: $input")
+        case Error(msg, input) => Left(s"Parser Error: '$msg'. Input: $input")
       })
 }

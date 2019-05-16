@@ -36,10 +36,9 @@ object FormulaLexer extends RegexParsers {
           | operator_divide
     )) ^^ { rawTokens => rawTokens }
 
-//  def tokenize(formula: String): ParseResult[List[FormulaToken]] = parse(tokens, formula)
   def tokenize(formula: String): Either[String, List[FormulaToken]] = parse(tokens, formula) match {
     case Success(tokens, _ ) => Right(tokens)
-    case Failure(msg, _) => Left(msg)
-    case Error(msg, _) => Left(msg)
+    case Failure(msg, input) => Left(s"Lexer Error: '$msg'. Input: $input")
+    case Error(msg, input) => Left(s"Lexer Error: '$msg'. Input $input")
   }
 }
