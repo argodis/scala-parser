@@ -1,5 +1,6 @@
 package de.argodis.tutorial.scalaparser
 import com.beust.jcommander.JCommander
+import de.argodis.tutorial.scalaparser.parser.FormulaParser
 import de.argodis.tutorial.scalaparser.parser.nodes.FormulaAST
 import de.argodis.tutorial.scalaparser.schema.{FormulaRow, InputDataRow}
 
@@ -16,19 +17,12 @@ object FormulaParserApp {
     arguments
   }
 
-  def parse(formulas: List[FormulaRow]): Either[String, List[(Long, FormulaAST)]] = Right(List())
-//    // Attempt to parse all formulas
-//    //    val trees = formulas.map(formulaRow => FormulaParser.parse2(formulaRow.formula))
-//    // We need to preserve the formula ids, so that we can map them
-//    val trees = formulas.map(formulaRow => FormulaParser.parse2(formulaRow.formula).map(ast => (formulaRow.id, ast)))
-//
-//    // Look for errors and return the first error found. Otherwise, return the list of formula ASTs, sorted by id:
-//    trees collectFirst {
-//      case Left(error) => error
-//    } toLeft {
-//      trees collect { case Right(r) => r }
-//    }.sortBy(_._1)
-//  }
+  def parse(formulas: List[FormulaRow]): Either[String, List[(Long, FormulaAST)]] = {
+    val trees = formulas.map(row => FormulaParser.parse(row.formula).map(ast => (row.id, ast)))
+    trees
+      .collectFirst { case Left(error) => error }
+      .toLeft(trees.collect {case Right(r) => r}.sortBy(_._1))
+  }
 
   def process(input: List[InputDataRow], trees: List[(Long, FormulaAST)]): Either[String, List[String]] = Right(List())
 
@@ -43,7 +37,7 @@ object FormulaParserApp {
     } yield msg
 
     result match {
-      case Left(errorMessage) => println(s"Error: $errorMessage")
+      case Left(errorMessage) => println(errorMessage)
       case Right(msg) => println(s"Success: $msg")
     }
   }
