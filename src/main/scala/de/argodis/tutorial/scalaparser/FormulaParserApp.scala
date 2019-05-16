@@ -1,5 +1,6 @@
 package de.argodis.tutorial.scalaparser
 import com.beust.jcommander.JCommander
+import de.argodis.tutorial.scalaparser.parser.FormulaEvaluator
 import de.argodis.tutorial.scalaparser.parser.FormulaParser
 import de.argodis.tutorial.scalaparser.parser.nodes.FormulaAST
 import de.argodis.tutorial.scalaparser.schema.{FormulaRow, InputDataRow}
@@ -24,7 +25,13 @@ object FormulaParserApp {
       .toLeft(trees.collect {case Right(r) => r}.sortBy(_._1))
   }
 
-  def process(input: List[InputDataRow], trees: List[(Long, FormulaAST)]): Either[String, List[String]] = Right(List())
+  def process(input: List[InputDataRow], formulas: List[(Long, FormulaAST)]): Either[String, List[String]] = {
+    val header = formulas.map(_._1.toString).mkString(",")
+    val output = input.map(row =>
+      formulas.map(formulaPair => FormulaEvaluator.evaluate(formulaPair._2, row.inputMap).mkString).mkString(",")
+    )
+    Right(header :: output)
+  }
 
   def main(args: Array[String]): Unit = {
     val arguments = parseCliArguments(args)
