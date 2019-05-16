@@ -41,15 +41,11 @@ object FormulaParser extends Parsers {
   private def formula: Parser[FormulaAST] = phrase(operator_sum)
 
   def parse(formulaExpression: String): Either[String, FormulaAST] =
-    // Unfortunately ParseResult does not provide flatMap
-    FormulaLexer.tokenize(formulaExpression) match {
-      case FormulaLexer.Success(tokens, _) =>
-        formula(FormulaTokenReader(tokens.asInstanceOf[List[FormulaToken]])) match {
-          case Success(formulaAST, _) => Right(formulaAST)
-          case Failure(msg, _) => Left(msg)
-          case Error(msg, _) => Left(msg)
-        }
-      case FormulaLexer.Failure(msg, _) => Left(msg)
-      case FormulaLexer.Error(msg, _) => Left(msg)
-    }
+    FormulaLexer
+      .tokenize(formulaExpression)
+      .flatMap(tokens => formula(FormulaTokenReader(tokens)) match {
+        case Success(ast, _) => Right(ast)
+        case Failure(msg, _) => Left(msg)
+        case Error(msg, _) => Left(msg)
+      })
 }
